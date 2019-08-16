@@ -8,7 +8,8 @@ defmodule EtsCleaner do
   end
 
   def init(init_state = [cleaner_module: _cleaner_module, check_interval: check_interval]) do
-    schedule_work(check_interval, 0)
+    mem_used = @system_memory.mem_percent_used()
+    schedule_work(check_interval, mem_used)
     {:ok, init_state}
   end
 

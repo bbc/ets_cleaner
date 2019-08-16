@@ -5,6 +5,13 @@ defmodule EtsCleanerTest do
   setup :set_mox_global
 
   setup do
+    # Define stubs so that the mocks exist when `EtsCleaner.init` is called
+    EtsCleaner.SystemMemoryMock
+    |> stub(:mem_percent_used, fn -> 20 end)
+
+    FakeCleanerMock
+    |> stub(:clean, fn _ -> :ok end)
+
     EtsCleaner.start_link(cleaner_module: FakeCleanerMock, check_interval: 100)
     :ok
   end
