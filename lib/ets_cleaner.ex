@@ -8,7 +8,9 @@ defmodule EtsCleaner do
   end
 
   def init(init_state = [cleaner_module: _cleaner_module, check_interval: check_interval]) do
-    schedule_work(check_interval)
+    IO.inspect(init_state, label: "initial state")
+    system_memory = Application.get_env(:ets_cleaner, :system_memory)
+    schedule_work(check_interval, system_memory.mem_percent_used())
     {:ok, init_state}
   end
 
@@ -19,7 +21,7 @@ defmodule EtsCleaner do
     @system_memory.mem_percent_used()
     |> cleaner_module.clean()
 
-    schedule_work(check_interval)
+    schedule_work(check_interval, 80)
     {:noreply, state}
   end
 
@@ -29,5 +31,12 @@ defmodule EtsCleaner do
     {:noreply, state}
   end
 
-  defp schedule_work(check_interval), do: Process.send_after(self(), :refresh, check_interval)
+
+  defp schedule_work(check_interval, mem_percent_used) when mem_percent_used >= 80 do
+    Process.send_after(self(), :refresh, check_interval * 0.2)
+  end
+
+  defp schedule_work(check_interval, _mem_percent_used) do
+    Process.send_after(self(), :refresh, check_interval)
+  end
 end

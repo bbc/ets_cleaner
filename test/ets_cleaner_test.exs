@@ -18,4 +18,14 @@ defmodule EtsCleanerTest do
 
     :timer.sleep(120)
   end
+
+  test "recall the fake cleaner mock twice when memory use is high" do
+    EtsCleaner.SystemMemoryMock
+    |> expect(:mem_percent_used, 2, fn -> 80 end)
+
+    FakeCleanerMock
+    |> expect(:clean, 2, fn 80 -> :ok end)
+
+    :timer.sleep(120)
+  end
 end
