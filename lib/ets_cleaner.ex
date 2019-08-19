@@ -1,7 +1,7 @@
 defmodule EtsCleaner do
   use GenServer
 
-  @system_memory Application.get_env(:ets_cleaner, :system_memory)
+  @system_memory Application.get_env(:ets_cleaner, :system_memory, EtsCleaner.SystemMemory)
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, opts, name: :local_cache_cleaner)
